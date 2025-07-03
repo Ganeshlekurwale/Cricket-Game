@@ -2,7 +2,7 @@
 
 Welcome to the immersive 3D Cricket Game project! 🎉✨
 
-##DEMO - https://ganeshlekurwale.github.io/Cricket-Game/
+## DEMO - https://ganeshlekurwale.github.io/Cricket-Game/
 
 ## Description ℹ️
 

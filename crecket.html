@@ -3,138 +3,611 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cricket Game</title>
+    <title>3D Cricket Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
       body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: linear-gradient(to bottom, #87ceeb, #98fb98);
+        font-family: Arial, sans-serif;
+      }
+
+      #gameContainer {
+        position: relative;
         width: 100vw;
         height: 100vh;
-        text-align: center;
-        background-image: url("https://wallpapers.com/images/featured-full/cricket-ground-9yo8w016faiow66m.jpg");
-        background-repeat: no-repeat;
-        background-size: cover;
-        display: flex;
-        justify-content: center;
-        align-items: center;
       }
+
+      #ui {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 18px;
+      }
+
+      #controls {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        display: flex;
+        gap: 20px;
+      }
+
       .btn {
-        margin: 0 10px;
-        padding: 5px;
-        font-size: 20px;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
-      .container {
-        height: 450px;
-        width: 450px;
-        background-color: rgba(218, 197, 197, 0.255);
-        border-radius: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        gap: 10px;
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      #bat-btn {
+        background: linear-gradient(45deg, #8b4513, #a0522d);
+      }
+      #ball-btn {
+        background: linear-gradient(45deg, #ff6b6b, #ff5252);
+      }
+      #stump-btn {
+        background: linear-gradient(45deg, #ffd700, #ffa000);
+      }
+
+      #result {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 200;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        font-size: 24px;
+        text-align: center;
+        display: none;
+        max-width: 400px;
+      }
+
+      #result button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Bat Ball Stump Game</h1>
-      <!-- Bat -->
-      <button
-        class="btn"
-        onclick="
-    let cumputerChoice = Math.random() * 3;
-    let result;
-    if(cumputerChoice > 0 && cumputerChoice < 1) {
-      cumputerChoice = 'Bat';
-    }
-    else if(cumputerChoice > 1 && cumputerChoice <2){
-      cumputerChoice = 'Ball';    }
-    else{
-      cumputerChoice = 'Stump';
-    }
-    
-    //result
-    if(cumputerChoice === 'Bat'){
-      result = 'Result Tie';
-    }
-    else if(cumputerChoice === 'Ball'){
-      result = 'You Won';
-    }
-    else{
-      result = 'Cumputer Won';
-    }
-    
-    alert(`You select : Bat \n Computer select : ${cumputerChoice} \n Result : ${result}`);
-    
-    "
-      >
-        Bat
-      </button>
+    <div id="gameContainer">
+      <div id="ui">
+        <h2>3D Cricket Game</h2>
+        <p>Score: <span id="score">0</span></p>
+        <p>Matches: <span id="matches">0</span></p>
+        <p>Choose your move!</p>
+      </div>
 
-      <!-- ball -->
-      <button
-        class="btn"
-        onclick="
-    cumputerChoice = Math.random() * 3;
-    // let result;
-    if(cumputerChoice > 0 && cumputerChoice < 1) {
-      cumputerChoice = 'Bat';
-    }
-    else if(cumputerChoice > 1 && cumputerChoice <2){
-      cumputerChoice = 'Ball';    }
-      else{
-        cumputerChoice = 'Stump';
-      }
-    
-    //result
-    if(cumputerChoice === 'Bat'){
-      result = 'Cumputer Won';
-    }
-    else if(cumputerChoice === 'Ball'){
-      result = 'Result Tie';
-    }
-    else{
-      result = 'You Won';
-    }
-    
-    alert(`You select : Ball \n Computer select : ${cumputerChoice} \n Result : ${result}`);
-    
-    "
-      >
-        Ball
-      </button>
+      <div id="controls">
+        <button class="btn" id="bat-btn" onclick="playGame('Bat')">
+          🏏 Bat
+        </button>
+        <button class="btn" id="ball-btn" onclick="playGame('Ball')">
+          🥎 Ball
+        </button>
+        <button class="btn" id="stump-btn" onclick="playGame('Stump')">
+          🏏 Stump
+        </button>
+      </div>
 
-      <!-- stump -->
-      <button
-        class="btn"
-        onclick="
-    cumputerChoice = Math.random() * 3;
-    // let result;
-    if(cumputerChoice > 0 && cumputerChoice < 1) {
-      cumputerChoice = 'Bat';
-    }
-    else if(cumputerChoice > 1 && cumputerChoice <2){
-      cumputerChoice = 'Ball';    }
-      else{
-        cumputerChoice = 'Stump';
-      }
-    
-      //result
-      if(cumputerChoice === 'Bat'){
-        result = 'You Won';
-    }
-    else if(cumputerChoice === 'Ball'){
-      result = 'Cumputer Won';
-    }
-    else{
-      result = 'Result Tie';
-    }
-    
-    alert(`You select : Stump \n Computer select : ${cumputerChoice} \n Result : ${result}`);
-    
-    "
-      >
-        Stump
-      </button>
+      <div id="result">
+        <div id="result-text"></div>
+        <button onclick="closeResult()">Play Again</button>
+      </div>
     </div>
+
+    <script>
+      // Game variables
+      let scene, camera, renderer, bat, ball, stumps, field;
+      let score = 0;
+      let matches = 0;
+      let isAnimating = false;
+
+      // Initialize the 3D scene
+      function init() {
+        // Create scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+
+        // Create camera
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.set(0, 10, 20);
+        camera.lookAt(0, 0, 0);
+
+        // Create renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x87ceeb);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document
+          .getElementById("gameContainer")
+          .appendChild(renderer.domElement);
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(50, 50, 50);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        scene.add(directionalLight);
+
+        // Create cricket field
+        createField();
+
+        // Create game objects
+        createBat();
+        createBall();
+        createStumps();
+
+        // Start animation loop
+        animate();
+      }
+
+      function createField() {
+        // Create grass field
+        const fieldGeometry = new THREE.PlaneGeometry(100, 100);
+        const fieldMaterial = new THREE.MeshLambertMaterial({
+          color: 0x00aa00,
+        });
+        field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+        field.rotation.x = -Math.PI / 2;
+        field.receiveShadow = true;
+        scene.add(field);
+
+        // Create pitch
+        const pitchGeometry = new THREE.PlaneGeometry(20, 4);
+        const pitchMaterial = new THREE.MeshLambertMaterial({
+          color: 0x8b4513,
+        });
+        const pitch = new THREE.Mesh(pitchGeometry, pitchMaterial);
+        pitch.rotation.x = -Math.PI / 2;
+        pitch.position.y = 0.01;
+        scene.add(pitch);
+
+        // Create boundary
+        const boundaryGeometry = new THREE.RingGeometry(45, 50, 32);
+        const boundaryMaterial = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+        });
+        const boundary = new THREE.Mesh(boundaryGeometry, boundaryMaterial);
+        boundary.rotation.x = -Math.PI / 2;
+        boundary.position.y = 0.02;
+        scene.add(boundary);
+      }
+
+      function createBat() {
+        const batGroup = new THREE.Group();
+
+        // Bat blade
+        const bladeGeometry = new THREE.BoxGeometry(0.3, 3, 0.1);
+        const bladeMaterial = new THREE.MeshLambertMaterial({
+          color: 0x8b4513,
+        });
+        const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+        blade.position.y = 1.5;
+        blade.castShadow = true;
+        batGroup.add(blade);
+
+        // Bat handle
+        const handleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1);
+        const handleMaterial = new THREE.MeshLambertMaterial({
+          color: 0x4a4a4a,
+        });
+        const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+        handle.position.y = 3.5;
+        handle.castShadow = true;
+        batGroup.add(handle);
+
+        bat = batGroup;
+        bat.position.set(-8, 0, 0);
+        scene.add(bat);
+      }
+
+      function createBall() {
+        const ballGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+        const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+        ball = new THREE.Mesh(ballGeometry, ballMaterial);
+        ball.position.set(0, 0.2, 0);
+        ball.castShadow = true;
+        scene.add(ball);
+      }
+
+      function createStumps() {
+        const stumpsGroup = new THREE.Group();
+
+        // Create three stumps
+        for (let i = 0; i < 3; i++) {
+          const stumpGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2);
+          const stumpMaterial = new THREE.MeshLambertMaterial({
+            color: 0xffd700,
+          });
+          const stump = new THREE.Mesh(stumpGeometry, stumpMaterial);
+          stump.position.set(i * 0.3 - 0.3, 1, 0);
+          stump.castShadow = true;
+          stumpsGroup.add(stump);
+        }
+
+        // Create bails
+        for (let i = 0; i < 2; i++) {
+          const bailGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.3);
+          const bailMaterial = new THREE.MeshLambertMaterial({
+            color: 0xffd700,
+          });
+          const bail = new THREE.Mesh(bailGeometry, bailMaterial);
+          bail.position.set(i * 0.3 - 0.15, 2.1, 0);
+          bail.rotation.z = Math.PI / 2;
+          bail.castShadow = true;
+          stumpsGroup.add(bail);
+        }
+
+        stumps = stumpsGroup;
+        stumps.position.set(8, 0, 0);
+        scene.add(stumps);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Rotate objects slowly
+        if (!isAnimating) {
+          bat.rotation.y += 0.01;
+          ball.rotation.x += 0.02;
+          ball.rotation.z += 0.01;
+          stumps.rotation.y += 0.01;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      function playGame(playerChoice) {
+        if (isAnimating) return;
+
+        isAnimating = true;
+        matches++;
+        document.getElementById("matches").textContent = matches;
+
+        // Generate computer choice
+        const choices = ["Bat", "Ball", "Stump"];
+        const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+        // Determine result
+        let result;
+        if (playerChoice === computerChoice) {
+          result = "Tie!";
+        } else if (
+          (playerChoice === "Bat" && computerChoice === "Ball") ||
+          (playerChoice === "Ball" && computerChoice === "Stump") ||
+          (playerChoice === "Stump" && computerChoice === "Bat")
+        ) {
+          result = "You Win!";
+          score++;
+          document.getElementById("score").textContent = score;
+        } else {
+          result = "Computer Wins!";
+        }
+
+        // Animate the chosen objects
+        animateChoice(playerChoice, computerChoice);
+
+        // Show result after animation
+        setTimeout(() => {
+          showResult(playerChoice, computerChoice, result);
+          isAnimating = false;
+        }, 2500);
+      }
+
+      function animateChoice(playerChoice, computerChoice) {
+        // Determine the type of interaction and animate accordingly
+        if (playerChoice === "Ball" && computerChoice === "Stump") {
+          // Ball hits stump - player wins
+          animateBallHitStump();
+        } else if (playerChoice === "Stump" && computerChoice === "Ball") {
+          // Ball hits stump - computer wins
+          animateBallHitStump();
+        } else if (playerChoice === "Bat" && computerChoice === "Ball") {
+          // Bat hits ball - player wins
+          animateBatHitBall();
+        } else if (playerChoice === "Ball" && computerChoice === "Bat") {
+          // Bat hits ball - computer wins
+          animateBatHitBall();
+        } else if (playerChoice === "Stump" && computerChoice === "Bat") {
+          // Bat breaks stump - player wins
+          animateBatBreakStump();
+        } else if (playerChoice === "Bat" && computerChoice === "Stump") {
+          // Bat breaks stump - computer wins
+          animateBatBreakStump();
+        } else {
+          // Same choice - tie animation
+          animateTie(playerChoice);
+        }
+      }
+
+      function animateBallHitStump() {
+        // Reset positions
+        resetObjectPositions();
+
+        // Animate ball moving towards stumps
+        const ballStartPos = { x: -10, y: 0.2, z: 0 };
+        const stumpPos = { x: 8, y: 0, z: 0 };
+
+        ball.position.set(ballStartPos.x, ballStartPos.y, ballStartPos.z);
+
+        const duration = 1500;
+        const startTime = Date.now();
+
+        function animate() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          if (progress < 0.7) {
+            // Ball moving towards stump
+            const moveProgress = progress / 0.7;
+            ball.position.x =
+              ballStartPos.x + (stumpPos.x - ballStartPos.x) * moveProgress;
+            ball.position.y =
+              ballStartPos.y + Math.sin(moveProgress * Math.PI) * 2;
+            ball.rotation.x += 0.3;
+            ball.rotation.z += 0.2;
+          } else {
+            // Impact animation
+            const impactProgress = (progress - 0.7) / 0.3;
+            ball.position.x = stumpPos.x;
+            ball.position.y = ballStartPos.y;
+
+            // Stumps fall back
+            stumps.rotation.z = (impactProgress * Math.PI) / 4;
+            stumps.position.y = -impactProgress * 0.5;
+
+            // Ball bounces back
+            ball.position.x = stumpPos.x + impactProgress * 2;
+            ball.position.y =
+              ballStartPos.y + Math.sin(impactProgress * Math.PI) * 1;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // Reset after animation
+            setTimeout(() => {
+              resetObjectPositions();
+            }, 500);
+          }
+        }
+
+        animate();
+      }
+
+      function animateBatHitBall() {
+        // Reset positions
+        resetObjectPositions();
+
+        const batStartPos = { x: -8, y: 0, z: 0 };
+        const ballStartPos = { x: 0, y: 0.2, z: 0 };
+
+        const duration = 1500;
+        const startTime = Date.now();
+
+        function animate() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          if (progress < 0.5) {
+            // Bat swinging towards ball
+            const swingProgress = progress / 0.5;
+            bat.rotation.z = (-swingProgress * Math.PI) / 2;
+            bat.position.x = batStartPos.x + swingProgress * 6;
+            bat.position.y = swingProgress * 2;
+          } else if (progress < 0.7) {
+            // Impact moment
+            const impactProgress = (progress - 0.5) / 0.2;
+            bat.rotation.z = -Math.PI / 2;
+            bat.position.x = batStartPos.x + 6;
+            bat.position.y = 2;
+
+            // Ball starts flying
+            ball.position.x = ballStartPos.x + impactProgress * 15;
+            ball.position.y = ballStartPos.y + impactProgress * 8;
+            ball.rotation.x += 0.5;
+            ball.rotation.y += 0.3;
+          } else {
+            // Follow through
+            const followProgress = (progress - 0.7) / 0.3;
+            bat.rotation.z = -Math.PI / 2 + (followProgress * Math.PI) / 3;
+
+            // Ball continues flying
+            ball.position.x = ballStartPos.x + 15 + followProgress * 10;
+            ball.position.y = ballStartPos.y + 8 - followProgress * 6;
+            ball.rotation.x += 0.3;
+            ball.rotation.y += 0.2;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // Reset after animation
+            setTimeout(() => {
+              resetObjectPositions();
+            }, 500);
+          }
+        }
+
+        animate();
+      }
+
+      function animateBatBreakStump() {
+        // Reset positions
+        resetObjectPositions();
+
+        const batStartPos = { x: -8, y: 0, z: 0 };
+        const stumpPos = { x: 8, y: 0, z: 0 };
+
+        const duration = 1500;
+        const startTime = Date.now();
+
+        function animate() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          if (progress < 0.6) {
+            // Bat moving towards stump
+            const moveProgress = progress / 0.6;
+            bat.position.x =
+              batStartPos.x + (stumpPos.x - batStartPos.x) * moveProgress;
+            bat.position.y = Math.sin(moveProgress * Math.PI) * 3;
+            bat.rotation.z = (moveProgress * Math.PI) / 2;
+          } else {
+            // Impact and destruction
+            const impactProgress = (progress - 0.6) / 0.4;
+            bat.position.x = stumpPos.x;
+            bat.position.y = 0;
+            bat.rotation.z = Math.PI / 2;
+
+            // Stumps scatter
+            stumps.rotation.x = (impactProgress * Math.PI) / 2;
+            stumps.rotation.y = (impactProgress * Math.PI) / 3;
+            stumps.position.y = -impactProgress * 2;
+            stumps.position.x = stumpPos.x + impactProgress * 3;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // Reset after animation
+            setTimeout(() => {
+              resetObjectPositions();
+            }, 500);
+          }
+        }
+
+        animate();
+      }
+
+      function animateTie(choice) {
+        // Both objects do a synchronized dance
+        const object = getObjectByChoice(choice);
+        const duration = 1500;
+        const startTime = Date.now();
+
+        function animate() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Synchronized spinning and bouncing
+          const bounce = Math.sin(progress * Math.PI * 4) * 2;
+          object.position.y = object.position.y + bounce * 0.1;
+          object.rotation.y += 0.15;
+
+          if (choice === "Ball") {
+            object.rotation.x += 0.1;
+            object.rotation.z += 0.1;
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            resetObjectPositions();
+          }
+        }
+
+        animate();
+      }
+
+      function getObjectByChoice(choice) {
+        switch (choice) {
+          case "Bat":
+            return bat;
+          case "Ball":
+            return ball;
+          case "Stump":
+            return stumps;
+          default:
+            return bat;
+        }
+      }
+
+      function resetObjectPositions() {
+        // Reset bat
+        bat.position.set(-8, 0, 0);
+        bat.rotation.set(0, 0, 0);
+
+        // Reset ball
+        ball.position.set(0, 0.2, 0);
+        ball.rotation.set(0, 0, 0);
+
+        // Reset stumps
+        stumps.position.set(8, 0, 0);
+        stumps.rotation.set(0, 0, 0);
+      }
+
+      function showResult(playerChoice, computerChoice, result) {
+        const resultDiv = document.getElementById("result");
+        const resultText = document.getElementById("result-text");
+
+        resultText.innerHTML = `
+          <h3>${result}</h3>
+          <p>You chose: ${playerChoice}</p>
+          <p>Computer chose: ${computerChoice}</p>
+          <p>Score: ${score} | Matches: ${matches}</p>
+        `;
+
+        resultDiv.style.display = "block";
+      }
+
+      function closeResult() {
+        document.getElementById("result").style.display = "none";
+      }
+
+      // Handle window resize
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Initialize the game
+      init();
+    </script>
   </body>
 </html>

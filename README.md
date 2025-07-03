@@ -2,6 +2,8 @@
 
 Welcome to the immersive 3D Cricket Game project! 🎉✨
 
+##DEMO - https://ganeshlekurwale.github.io/Cricket-Game/
+
 ## Description ℹ️
 
 3D Cricket Game is an interactive web-based game that brings the excitement of cricket to life with stunning 3D graphics and realistic animations. Built with Three.js, this game features a complete 3D cricket environment where players can experience authentic cricket interactions. Watch as the ball flies through the air, bat swings with precision, and stumps scatter on impact! It's cricket gaming like you've never seen before! 🕹️🎯

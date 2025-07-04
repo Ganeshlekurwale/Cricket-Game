@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>3D Cricket Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -12,6 +15,11 @@
         overflow: hidden;
         background: linear-gradient(to bottom, #87ceeb, #98fb98);
         font-family: Arial, sans-serif;
+        touch-action: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
 
       #gameContainer {
@@ -22,37 +30,53 @@
 
       #ui {
         position: absolute;
-        top: 20px;
-        left: 20px;
+        top: 10px;
+        left: 10px;
         z-index: 100;
         color: white;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 20px;
-        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        max-width: 200px;
+      }
+
+      #ui h2 {
+        margin: 0 0 8px 0;
         font-size: 18px;
+      }
+
+      #ui p {
+        margin: 4px 0;
+        font-size: 12px;
       }
 
       #controls {
         position: absolute;
-        bottom: 30px;
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 100;
         display: flex;
-        gap: 20px;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 90vw;
       }
 
       .btn {
-        padding: 15px 30px;
-        font-size: 18px;
+        padding: 12px 20px;
+        font-size: 16px;
         font-weight: bold;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s ease;
         background: linear-gradient(45deg, #4caf50, #45a049);
         color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        min-width: 80px;
+        touch-action: manipulation;
       }
 
       .btn:hover {
@@ -82,23 +106,159 @@
         z-index: 200;
         background: rgba(0, 0, 0, 0.9);
         color: white;
-        padding: 30px;
-        border-radius: 15px;
-        font-size: 24px;
+        padding: 20px;
+        border-radius: 12px;
+        font-size: 18px;
         text-align: center;
         display: none;
-        max-width: 400px;
+        max-width: 300px;
+        width: 90vw;
+        box-sizing: border-box;
+      }
+
+      #result h3 {
+        margin: 0 0 15px 0;
+        font-size: 24px;
+      }
+
+      #result p {
+        margin: 8px 0;
+        font-size: 16px;
       }
 
       #result button {
-        margin-top: 20px;
-        padding: 10px 20px;
+        margin-top: 15px;
+        padding: 12px 24px;
         font-size: 16px;
         background: #4caf50;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      /* Mobile Touch Controls */
+      #touch-controls {
+        position: absolute;
+        bottom: 150px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        display: none;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px;
+        border-radius: 8px;
+        color: white;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      #touch-joystick {
+        position: absolute;
+        bottom: 100px;
+        right: 20px;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        display: none;
+        z-index: 100;
+      }
+
+      #touch-joystick-knob {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.1s ease;
+      }
+
+      /* Mobile Media Query */
+      @media (max-width: 768px) {
+        #ui {
+          top: 5px;
+          left: 5px;
+          padding: 8px 12px;
+          font-size: 12px;
+          max-width: 150px;
+        }
+
+        #ui h2 {
+          font-size: 16px;
+        }
+
+        #ui p {
+          font-size: 11px;
+        }
+
+        #controls {
+          bottom: 10px;
+          gap: 8px;
+        }
+
+        .btn {
+          padding: 10px 16px;
+          font-size: 14px;
+          min-width: 70px;
+        }
+
+        #touch-controls {
+          display: block;
+        }
+
+        #touch-joystick {
+          display: block;
+        }
+
+        #result {
+          padding: 15px;
+          font-size: 16px;
+          max-width: 280px;
+        }
+
+        #result h3 {
+          font-size: 20px;
+        }
+
+        #result p {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #ui {
+          font-size: 11px;
+          max-width: 130px;
+        }
+
+        #ui h2 {
+          font-size: 14px;
+        }
+
+        .btn {
+          padding: 8px 12px;
+          font-size: 12px;
+          min-width: 60px;
+        }
+
+        #result {
+          padding: 12px;
+          font-size: 14px;
+        }
+
+        #result h3 {
+          font-size: 18px;
+        }
+
+        #result p {
+          font-size: 13px;
+        }
       }
     </style>
   </head>
@@ -109,6 +269,15 @@
         <p>Score: <span id="score">0</span></p>
         <p>Matches: <span id="matches">0</span></p>
         <p>Choose your move!</p>
+      </div>
+
+      <div id="touch-controls">
+        <p>👆 Touch and drag to look around</p>
+        <p>🎮 Use virtual joystick to move</p>
+      </div>
+
+      <div id="touch-joystick">
+        <div id="touch-joystick-knob"></div>
       </div>
 
       <div id="controls">
@@ -135,6 +304,31 @@
       let score = 0;
       let matches = 0;
       let isAnimating = false;
+
+      // Mobile detection
+      let isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+
+      // Touch controls
+      let touchStartX = 0,
+        touchStartY = 0;
+      let touchX = 0,
+        touchY = 0;
+      let phi = 0,
+        theta = 0;
+      let isJoystickActive = false;
+      let joystickStartX = 0,
+        joystickStartY = 0;
+      let joystickX = 0,
+        joystickY = 0;
+
+      // Movement
+      let moveForward = false,
+        moveBackward = false,
+        moveLeft = false,
+        moveRight = false;
 
       // Initialize the 3D scene
       function init() {
@@ -180,6 +374,9 @@
         createBat();
         createBall();
         createStumps();
+
+        // Setup controls
+        setupControls();
 
         // Start animation loop
         animate();
@@ -287,8 +484,228 @@
         scene.add(stumps);
       }
 
+      function setupControls() {
+        if (isMobile) {
+          setupTouchControls();
+        } else {
+          setupDesktopControls();
+        }
+      }
+
+      function setupTouchControls() {
+        // Touch look controls
+        renderer.domElement.addEventListener("touchstart", onTouchStart, {
+          passive: false,
+        });
+        renderer.domElement.addEventListener("touchmove", onTouchMove, {
+          passive: false,
+        });
+        renderer.domElement.addEventListener("touchend", onTouchEnd, {
+          passive: false,
+        });
+
+        // Virtual joystick
+        const joystick = document.getElementById("touch-joystick");
+        joystick.addEventListener("touchstart", onJoystickStart, {
+          passive: false,
+        });
+        joystick.addEventListener("touchmove", onJoystickMove, {
+          passive: false,
+        });
+        joystick.addEventListener("touchend", onJoystickEnd, {
+          passive: false,
+        });
+      }
+
+      function setupDesktopControls() {
+        // Mouse controls for desktop
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("keydown", onKeyDown);
+        document.addEventListener("keyup", onKeyUp);
+      }
+
+      function onTouchStart(event) {
+        event.preventDefault();
+        if (event.touches.length === 1) {
+          touchStartX = event.touches[0].clientX;
+          touchStartY = event.touches[0].clientY;
+        }
+      }
+
+      function onTouchMove(event) {
+        event.preventDefault();
+        if (event.touches.length === 1) {
+          touchX = event.touches[0].clientX - touchStartX;
+          touchY = event.touches[0].clientY - touchStartY;
+
+          const sensitivity = 0.003;
+          phi -= touchX * sensitivity;
+          theta -= touchY * sensitivity;
+
+          // Limit vertical rotation
+          theta = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, theta));
+
+          updateCameraRotation();
+
+          touchStartX = event.touches[0].clientX;
+          touchStartY = event.touches[0].clientY;
+        }
+      }
+
+      function onTouchEnd(event) {
+        event.preventDefault();
+        touchX = 0;
+        touchY = 0;
+      }
+
+      function onJoystickStart(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        isJoystickActive = true;
+        const rect = event.target.getBoundingClientRect();
+        joystickStartX = rect.left + rect.width / 2;
+        joystickStartY = rect.top + rect.height / 2;
+      }
+
+      function onJoystickMove(event) {
+        if (!isJoystickActive) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - joystickStartX;
+        const deltaY = touch.clientY - joystickStartY;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const maxDistance = 25;
+
+        if (distance < maxDistance) {
+          joystickX = deltaX / maxDistance;
+          joystickY = deltaY / maxDistance;
+        } else {
+          joystickX = (deltaX / distance) * (maxDistance / maxDistance);
+          joystickY = (deltaY / distance) * (maxDistance / maxDistance);
+        }
+
+        // Update joystick knob position
+        const knob = document.getElementById("touch-joystick-knob");
+        knob.style.transform = `translate(${joystickX * 25 - 50}%, ${
+          joystickY * 25 - 50
+        }%)`;
+
+        // Set movement flags
+        moveForward = joystickY < -0.3;
+        moveBackward = joystickY > 0.3;
+        moveLeft = joystickX < -0.3;
+        moveRight = joystickX > 0.3;
+      }
+
+      function onJoystickEnd(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        isJoystickActive = false;
+        joystickX = 0;
+        joystickY = 0;
+
+        // Reset knob position
+        const knob = document.getElementById("touch-joystick-knob");
+        knob.style.transform = "translate(-50%, -50%)";
+
+        // Reset movement flags
+        moveForward = moveBackward = moveLeft = moveRight = false;
+      }
+
+      function onMouseMove(event) {
+        // Desktop mouse controls (existing code can be added here if needed)
+      }
+
+      function onKeyDown(event) {
+        switch (event.code) {
+          case "KeyW":
+            moveForward = true;
+            break;
+          case "KeyA":
+            moveLeft = true;
+            break;
+          case "KeyS":
+            moveBackward = true;
+            break;
+          case "KeyD":
+            moveRight = true;
+            break;
+        }
+      }
+
+      function onKeyUp(event) {
+        switch (event.code) {
+          case "KeyW":
+            moveForward = false;
+            break;
+          case "KeyA":
+            moveLeft = false;
+            break;
+          case "KeyS":
+            moveBackward = false;
+            break;
+          case "KeyD":
+            moveRight = false;
+            break;
+        }
+      }
+
+      function updateCameraRotation() {
+        const x = Math.sin(phi) * Math.cos(theta);
+        const y = Math.sin(theta);
+        const z = Math.cos(phi) * Math.cos(theta);
+
+        const target = new THREE.Vector3(
+          camera.position.x + x,
+          camera.position.y + y,
+          camera.position.z + z
+        );
+
+        camera.lookAt(target);
+      }
+
+      function updateCameraMovement() {
+        const moveSpeed = 0.5;
+        const direction = new THREE.Vector3();
+        const right = new THREE.Vector3();
+
+        // Calculate forward direction
+        const forward = new THREE.Vector3(
+          Math.sin(phi),
+          0,
+          Math.cos(phi)
+        ).normalize();
+
+        // Calculate right direction
+        right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+        if (moveForward) {
+          direction.add(forward);
+        }
+        if (moveBackward) {
+          direction.sub(forward);
+        }
+        if (moveLeft) {
+          direction.sub(right);
+        }
+        if (moveRight) {
+          direction.add(right);
+        }
+
+        if (direction.length() > 0) {
+          direction.normalize().multiplyScalar(moveSpeed);
+          camera.position.add(direction);
+        }
+      }
+
       function animate() {
         requestAnimationFrame(animate);
+
+        // Update camera movement
+        updateCameraMovement();
 
         // Rotate objects slowly
         if (!isAnimating) {

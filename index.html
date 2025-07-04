@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Cricket Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
     <style>
       body {
         margin: 0;
@@ -40,6 +41,47 @@
         z-index: 100;
         display: flex;
         gap: 20px;
+      }
+
+      #camera-controls {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+
+      #camera-controls h4 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
+
+      #camera-controls p {
+        margin: 5px 0;
+        font-size: 12px;
+      }
+
+      .control-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: linear-gradient(45deg, #2196f3, #1976d2);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        margin: 2px;
+      }
+
+      .control-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
       }
 
       .btn {
@@ -111,6 +153,20 @@
         <p>Choose your move!</p>
       </div>
 
+      <div id="camera-controls">
+        <h4>🎮 Camera Controls</h4>
+        <p>🖱️ Mouse: Orbit around</p>
+        <p>🔄 Wheel: Zoom in/out</p>
+        <p>⌨️ Keys: WASD to move</p>
+        <div>
+          <button class="control-btn" onclick="resetCamera()">
+            📷 Reset View
+          </button>
+          <button class="control-btn" onclick="topView()">🔝 Top View</button>
+          <button class="control-btn" onclick="sideView()">📐 Side View</button>
+        </div>
+      </div>
+
       <div id="controls">
         <button class="btn" id="bat-btn" onclick="playGame('Bat')">
           🏏 Bat
@@ -131,10 +187,11 @@
 
     <script>
       // Game variables
-      let scene, camera, renderer, bat, ball, stumps, field;
+      let scene, camera, renderer, controls, bat, ball, stumps, field;
       let score = 0;
       let matches = 0;
       let isAnimating = false;
+      let keys = { w: false, a: false, s: false, d: false };
 
       // Initialize the 3D scene
       function init() {
@@ -180,6 +237,9 @@
         createBat();
         createBall();
         createStumps();
+
+        // Setup camera controls
+        setupControls();
 
         // Start animation loop
         animate();
@@ -287,8 +347,108 @@
         scene.add(stumps);
       }
 
+      function setupControls() {
+        // Setup OrbitControls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 5;
+        controls.maxDistance = 100;
+        controls.maxPolarAngle = Math.PI / 2;
+
+        // Keyboard controls
+        document.addEventListener("keydown", onKeyDown);
+        document.addEventListener("keyup", onKeyUp);
+      }
+
+      function onKeyDown(event) {
+        switch (event.code) {
+          case "KeyW":
+            keys.w = true;
+            break;
+          case "KeyA":
+            keys.a = true;
+            break;
+          case "KeyS":
+            keys.s = true;
+            break;
+          case "KeyD":
+            keys.d = true;
+            break;
+        }
+      }
+
+      function onKeyUp(event) {
+        switch (event.code) {
+          case "KeyW":
+            keys.w = false;
+            break;
+          case "KeyA":
+            keys.a = false;
+            break;
+          case "KeyS":
+            keys.s = false;
+            break;
+          case "KeyD":
+            keys.d = false;
+            break;
+        }
+      }
+
+      function updateCameraMovement() {
+        if (!controls) return;
+
+        const moveSpeed = 0.5;
+        const direction = new THREE.Vector3();
+
+        if (keys.w) {
+          direction.z -= moveSpeed;
+        }
+        if (keys.s) {
+          direction.z += moveSpeed;
+        }
+        if (keys.a) {
+          direction.x -= moveSpeed;
+        }
+        if (keys.d) {
+          direction.x += moveSpeed;
+        }
+
+        if (direction.length() > 0) {
+          camera.position.add(direction);
+          controls.target.add(direction);
+        }
+      }
+
+      function resetCamera() {
+        camera.position.set(0, 10, 20);
+        controls.target.set(0, 0, 0);
+        controls.update();
+      }
+
+      function topView() {
+        camera.position.set(0, 30, 0);
+        controls.target.set(0, 0, 0);
+        controls.update();
+      }
+
+      function sideView() {
+        camera.position.set(25, 10, 0);
+        controls.target.set(0, 0, 0);
+        controls.update();
+      }
+
       function animate() {
         requestAnimationFrame(animate);
+
+        // Update camera controls
+        if (controls) {
+          controls.update();
+        }
+
+        // Update keyboard camera movement
+        updateCameraMovement();
 
         // Rotate objects slowly
         if (!isAnimating) {
@@ -604,6 +764,9 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        if (controls) {
+          controls.handleResize();
+        }
       });
 
       // Initialize the game
